@@ -107,7 +107,7 @@ sequenceDiagram
     participant Controller as TaskController
     participant Service as TaskService
     participant Repository as TaskRepository
-    participant DB as Base de Datos (SQLite)
+    participant DB as Base de Datos (PostgreSQL)
 
     Usuario->>Controller: POST /api/tasks (TaskDto)
     Controller->>Controller: Valida modelo (ModelState)
@@ -133,7 +133,7 @@ sequenceDiagram
 
 ## Vista 3: Vista de Despliegue
 
-Muestra cómo se despliega TaskFlow en el entorno de ejecución del estudiante (entorno local de desarrollo).
+Muestra cómo se despliega TaskFlow en el entorno de ejecución del estudiante (entorno local de desarrollo), con PostgreSQL como motor de base de datos.
 
 ```mermaid
 graph TD
@@ -141,10 +141,10 @@ graph TD
         subgraph DotNet["Proceso: ASP.NET Core Runtime"]
             API["TaskFlow API\n(ASP.NET Core Web API)"]
         end
-        subgraph Datos["Almacenamiento Local"]
-            DB[("taskflow.db\n(SQLite)")]
+        subgraph Datos["Servidor de Base de Datos"]
+            DB[("PostgreSQL\n(puerto 5432)")]
         end
-        API -- "Entity Framework Core\n(lectura/escritura)" --> DB
+        API -- "Entity Framework Core\n(Npgsql Provider)" --> DB
     end
 
     subgraph Cliente["Navegador / Cliente HTTP"]
@@ -197,7 +197,7 @@ graph LR
     end
 
     subgraph Externo["🗄️ Base de Datos"]
-        DB[("SQLite / SQL Server")]
+        DB[("PostgreSQL")]
     end
 
     TC --> ITS
