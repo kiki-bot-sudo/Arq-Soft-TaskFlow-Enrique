@@ -1,5 +1,6 @@
 using TaskFlow.Application.Interfaces;
 using TaskFlow.Domain.Models;
+using TaskFlow.Infrastructure.Interfaces;
 
 namespace TaskFlow.Application.Services
 {
