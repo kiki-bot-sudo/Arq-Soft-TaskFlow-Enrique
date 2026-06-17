@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.DTOs;
 using TaskFlow.Application.Interfaces;
 using TaskFlow.Domain.Models;
+using Task = TaskFlow.Domain.Models.Task;
 
 namespace TaskFlow.Api.Controllers
 {

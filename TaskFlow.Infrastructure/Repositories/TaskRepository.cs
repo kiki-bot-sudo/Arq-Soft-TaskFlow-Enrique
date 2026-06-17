@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskFlow.Domain.Models;
 using TaskFlow.Infrastructure.Data;
 using TaskFlow.Infrastructure.Interfaces;
+using Task = TaskFlow.Domain.Models.Task;
 
 namespace TaskFlow.Infrastructure.Repositories
 {
