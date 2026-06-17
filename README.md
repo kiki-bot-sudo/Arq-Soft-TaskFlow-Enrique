@@ -308,6 +308,7 @@ La **comprensión de conceptos**, **decisiones arquitectónicas**, **integració
 - Alumno de Tecnológico de Software
 - Estudiante de Arquitectura de Software
 - GitHub: [@kiki-bot-sudo](https://github.com/kiki-bot-sudo)
+- Email: enrique.zavala@tecdesoftware.edu.mx
 
 ---
 
@@ -332,7 +333,7 @@ Las contribuciones son bienvenidas. Por favor:
 
 Para preguntas o sugerencias sobre TaskFlow:
 - GitHub Issues: [Reportar problema](https://github.com/kiki-bot-sudo/Arq-Soft-TaskFlow-Enrique/issues)
-- Email: (Tu email aquí)
+- Email: enrique.zavala@tecdesoftware.edu.mx
 
 ---
 
