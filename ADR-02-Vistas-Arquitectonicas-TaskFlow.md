@@ -1,10 +1,10 @@
 # ADR-02: Vistas Arquitectónicas del Sistema TaskFlow
 
 | Campo   | Valor              |
-|---------|--------------------|
+|---------|--------------------| 
 | Autor   | Enrique Zavala     |
 | Fecha   | 05/06/2026         |
-| Estado  | Propuesto          |
+| Estado  | Aprobado           |
 | Basado en | ADR-01           |
 
 ---
@@ -26,6 +26,8 @@ Se documentan las **4 vistas arquitectónicas del modelo 4+1** aplicadas al proy
 3. **Vista de Despliegue** – Infraestructura física donde corre el sistema.
 4. **Vista Física** – Distribución de componentes y módulos del sistema.
 
+Además, se implementó una **capa de API REST** que expone los servicios de TaskFlow mediante HTTP, permitiendo que clientes externos (web, móvil, etc.) consuman los servicios sin acoplamiento a la implementación interna.
+
 ---
 
 ## ¿Por qué estas vistas?
@@ -33,15 +35,16 @@ Se documentan las **4 vistas arquitectónicas del modelo 4+1** aplicadas al proy
 - El modelo 4+1 es un estándar reconocido para documentar arquitecturas de software.
 - Permiten entender el sistema desde distintos ángulos: desarrollador, operaciones y stakeholders.
 - Los diagramas en Mermaid son compatibles con GitHub y no requieren herramientas externas.
+- La capa API REST facilita la integración con múltiples clientes y sigue el patrón REST bien conocido.
 - Complementan la arquitectura en capas ya definida en ADR-01.
 
 ---
 
 ## Vista 1: Vista Lógica
 
-Muestra las principales clases, capas y sus relaciones dentro del sistema TaskFlow.
+Muestra las principales clases, capas y sus relaciones dentro del sistema TaskFlow, incluyendo la capa API REST.
 
-```mermaid
+\`\`\`mermaid
 classDiagram
     class TaskController {
         +GetAll() IActionResult
@@ -49,6 +52,14 @@ classDiagram
         +Create(taskDto) IActionResult
         +Update(id, taskDto) IActionResult
         +Delete(id) IActionResult
+    }
+
+    class TaskApiController {
+        +GetAll() IActionResult
+        +GetById(id) IActionResult
+        +CreateTask(taskDto) IActionResult
+        +UpdateTask(id, taskDto) IActionResult
+        +DeleteTask(id) IActionResult
     }
 
     class TaskService {
@@ -88,84 +99,101 @@ classDiagram
     }
 
     TaskController --> TaskService : usa
+    TaskApiController --> TaskService : usa
     TaskService --> TaskRepository : usa
     TaskRepository --> AppDbContext : usa
     TaskRepository --> Task : maneja
     TaskController --> TaskDto : recibe/retorna
+    TaskApiController --> TaskDto : recibe/retorna
     TaskService --> TaskDto : procesa
-```
+\`\`\`
 
 ---
 
 ## Vista 2: Vista de Procesos
 
-Muestra el flujo de ejecución cuando un usuario crea una nueva tarea en TaskFlow.
+Muestra el flujo de ejecución cuando un cliente (navegador o aplicación móvil) realiza una petición a la API REST para crear una nueva tarea.
 
-```mermaid
+\`\`\`mermaid
 sequenceDiagram
     actor Usuario
-    participant Controller as TaskController
+    participant Browser as Cliente HTTP<br/>(Navegador / Postman)
+    participant ApiController as TaskApiController
     participant Service as TaskService
     participant Repository as TaskRepository
-    participant DB as Base de Datos (PostgreSQL)
+    participant DB as Base de Datos<br/>(PostgreSQL)
 
-    Usuario->>Controller: POST /api/tasks (TaskDto)
-    Controller->>Controller: Valida modelo (ModelState)
+    Usuario->>Browser: Hacer petición POST
+    Browser->>ApiController: POST /api/tasks (TaskDto)
+    ApiController->>ApiController: Valida modelo (ModelState)
     alt Modelo inválido
-        Controller-->>Usuario: 400 Bad Request
+        ApiController-->>Browser: 400 Bad Request (JSON)
     else Modelo válido
-        Controller->>Service: CreateTask(taskDto)
+        ApiController->>Service: CreateTask(taskDto)
         Service->>Service: Mapea DTO a entidad Task
         Service->>Repository: Save(task)
         Repository->>DB: INSERT INTO Tasks
         DB-->>Repository: Filas afectadas
         Repository-->>Service: true / false
-        Service-->>Controller: true / false
+        Service-->>ApiController: true / false
         alt Guardado exitoso
-            Controller-->>Usuario: 201 Created
+            ApiController-->>Browser: 201 Created (JSON)
         else Error al guardar
-            Controller-->>Usuario: 500 Internal Server Error
+            ApiController-->>Browser: 500 Internal Server Error
         end
     end
-```
+    Browser-->>Usuario: Resultado (JSON)
+\`\`\`
 
 ---
 
 ## Vista 3: Vista de Despliegue
 
-Muestra cómo se despliega TaskFlow en el entorno de ejecución del estudiante (entorno local de desarrollo), con PostgreSQL como motor de base de datos.
+Muestra cómo se despliega TaskFlow en el entorno de ejecución del estudiante, con la capa API REST exponiendo los servicios.
 
-```mermaid
+\`\`\`mermaid
 graph TD
     subgraph PC_Estudiante["💻 PC del Estudiante (Windows / macOS)"]
         subgraph DotNet["Proceso: ASP.NET Core Runtime"]
-            API["TaskFlow API\n(ASP.NET Core Web API)"]
+            MVC["TaskFlow MVC<br/>(Controllers/Views)"]
+            API["TaskFlow API REST<br/>(Api Controllers)"]
+            Services["Task Services<br/>(Lógica de negocio)"]
         end
         subgraph Datos["Servidor de Base de Datos"]
-            DB[("PostgreSQL\n(puerto 5432)")]
+            DB[("PostgreSQL<br/>(puerto 5432)")]
         end
-        API -- "Entity Framework Core\n(Npgsql Provider)" --> DB
+        MVC --> Services
+        API --> Services
+        Services -- "Entity Framework Core<br/>(Npgsql Provider)" --> DB
     end
 
-    subgraph Cliente["Navegador / Cliente HTTP"]
-        Browser["Swagger UI / Postman\n(pruebas de la API)"]
+    subgraph Cliente["Clientes HTTP"]
+        Browser["Navegador<br/>(MVC Web)"]
+        Postman["Postman / cURL<br/>(Pruebas API REST)"]
+        Mobile["App Móvil<br/>(Futuro)"]
     end
 
-    Browser -- "HTTP :5000" --> API
-```
+    Browser -- "HTTP :5000" --> MVC
+    Postman -- "HTTP :5000" --> API
+    Mobile -- "HTTP :5000" --> API
+\`\`\`
 
 ---
 
 ## Vista 4: Vista Física (Componentes)
 
-Muestra los módulos y componentes del sistema y cómo están organizados dentro del proyecto.
+Muestra los módulos y componentes del sistema, incluyendo la capa API REST.
 
-```mermaid
+\`\`\`mermaid
 graph LR
     subgraph TaskFlow_Project["📦 Proyecto TaskFlow (ASP.NET Core)"]
 
-        subgraph Controllers["📂 Controllers"]
+        subgraph MvcControllers["📂 Controllers (MVC)"]
             TC[TaskController]
+        end
+
+        subgraph ApiControllers["📂 Api/Controllers (REST)"]
+            TAC[TaskApiController]
         end
 
         subgraph Services["📂 Services"]
@@ -200,49 +228,91 @@ graph LR
         DB[("PostgreSQL")]
     end
 
-    TC --> ITS
-    ITS -.implementa.- TS
-    TS --> ITR
-    ITR -.implementa.- TR
+    TC --> TS
+    TAC --> TS
+    TS --> TR
     TR --> CTX
     CTX --> DB
-    TC --> TD
-    TS --> TM
-    PP --> TC
-    PP --> CTX
-    AS --> CTX
-```
+\`\`\`
 
 ---
 
-## Consecuencias
+## Implementación: Capa API REST
 
-**Ventajas:**
-- Las vistas documentan el sistema desde múltiples perspectivas, mejorando la comprensión.
-- Los diagramas Mermaid se renderizan directamente en GitHub sin herramientas adicionales.
-- Facilitan la incorporación de nuevos desarrolladores o revisores al proyecto.
-- Sirven como base para futuras decisiones de arquitectura.
+La capa API REST se implementó en `TaskFlow.Api` como un proyecto separado que expone los servicios del negocio mediante controladores REST siguiendo el patrón de convención sobre configuración de ASP.NET Core.
 
-**Desventajas:**
-- Requiere mantener los diagramas actualizados conforme evoluciona el código.
-- La vista de despliegue es simple por tratarse de un entorno local de desarrollo.
+### Estructura de la API REST:
+
+\`\`\`
+TaskFlow.Api/
+├── Controllers/
+│   ├── TaskApiController.cs          # Endpoints: GET, POST, PUT, DELETE
+│   ├── TaskCategoryApiController.cs  # Endpoints para categorías
+│   └── TaskStatusApiController.cs    # Endpoints para estados
+├── Dtos/
+│   ├── CreateTaskDto.cs
+│   ├── UpdateTaskDto.cs
+│   └── TaskResponseDto.cs
+├── Mapping/
+│   └── MappingProfile.cs             # AutoMapper para DTO ↔ Entidad
+└── Program.cs                        # Registro de servicios y CORS
+\`\`\`
+
+### Endpoints REST Implementados:
+
+| Verbo HTTP | Endpoint              | Descripción                |
+|------------|-----------------------|---------------------------|
+| GET        | /api/tasks            | Obtener todas las tareas   |
+| GET        | /api/tasks/{id}       | Obtener tarea por ID       |
+| POST       | /api/tasks            | Crear nueva tarea          |
+| PUT        | /api/tasks/{id}       | Actualizar tarea existente |
+| DELETE     | /api/tasks/{id}       | Eliminar tarea             |
+
+### Configuración CORS:
+
+En `Program.cs` se configuró CORS para permitir acceso desde clientes web:
+
+\`\`\`csharp
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+app.UseCors("AllowAll");
+\`\`\`
+
+### Mapeo DTO:
+
+Se utilizó **AutoMapper** para mapear entre DTOs y entidades:
+
+\`\`\`csharp
+public class TaskDto
+{
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public bool IsCompleted { get; set; }
+    public DateTime? DueDate { get; set; }
+}
+\`\`\`
 
 ---
 
-## Alternativas consideradas
+## Beneficios de esta Arquitectura
 
-| Alternativa | Razón de descarte |
-|---|---|
-| UML con herramienta gráfica (Lucidchart, etc.) | No integra bien con el repositorio; requiere exportar imágenes |
-| Draw.io en XML | Más complejo de versionar; Mermaid es más legible en texto plano |
-| No documentar vistas | Incumple el objetivo de la práctica y dificulta el mantenimiento |
-
----
-
-## Declaración de uso de IA
-
-Para la elaboración de este ADR se utilizó inteligencia artificial (Claude de Anthropic) como apoyo en la redacción y generación de los diagramas Mermaid. La revisión, validación del contenido y decisiones arquitectónicas son responsabilidad del autor.
+1. **Separación de responsabilidades:** MVC maneja presentación web, API maneja datos.
+2. **Reutilización de servicios:** Tanto MVC como API usan la misma capa de ServiceS.
+3. **Escalabilidad:** Fácil agregar nuevos clientes (móvil, escritorio) sin modificar lógica.
+4. **Testing:** Cada capa puede testearse independientemente.
+5. **Documentación automática:** Swagger genera documentación de la API automáticamente.
 
 ---
 
-*ADR-02 — TaskFlow | Enrique Zavala | Junio 2026*
+## Conclusión
+
+La implementación de vistas arquitectónicas basadas en el modelo 4+1, junto con una capa API REST bien definida, proporciona a TaskFlow una arquitectura sólida, mantenible y escalable que permite evolucionar el sistema para soportar múltiples clientes en el futuro.
