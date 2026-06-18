@@ -10,6 +10,6 @@ namespace TaskFlow.Infrastructure.Interfaces
         Task<Task> CreateTaskAsync(Task task);
         Task<Task> UpdateTaskAsync(Task task);
         Task<bool> DeleteTaskAsync(int id);
-        Task SaveChangesAsync();
+        System.Threading.Tasks.Task SaveChangesAsync();
     }
 }

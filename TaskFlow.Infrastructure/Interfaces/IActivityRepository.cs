@@ -1,5 +1,5 @@
 using TaskFlow.Domain.Models;
-using Task = TaskFlow.Domain.Models.Task;
+using Task = System.Threading.Tasks.Task;
 
 namespace TaskFlow.Infrastructure.Interfaces
 {

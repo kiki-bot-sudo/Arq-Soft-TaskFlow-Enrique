@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskFlow.Domain.Models;
 using TaskFlow.Infrastructure.Data;
 using TaskFlow.Infrastructure.Interfaces;
+using Task = System.Threading.Tasks.Task;  
 
 namespace TaskFlow.Infrastructure.Repositories
 {
@@ -58,7 +59,8 @@ namespace TaskFlow.Infrastructure.Repositories
 
         public async Task SaveChangesAsync()
         {
-            await _context.SaveChangesAsync();
+            await Task.CompletedTask;
+            await _context.SaveChangesAsync();  
         }
     }
 }
