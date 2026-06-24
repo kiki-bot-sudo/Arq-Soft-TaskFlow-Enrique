@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using TaskFlow.Domain.Models;
 using TaskFlow.Infrastructure.Data;
 using TaskFlow.Infrastructure.Interfaces;
-using Task = System.Threading.Tasks.Task;  
 
 namespace TaskFlow.Infrastructure.Repositories
 {
@@ -15,7 +14,7 @@ namespace TaskFlow.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Activity>> GetActivitiesByDateAsync(DateTime date)
+        public async System.Threading.Tasks.Task<IEnumerable<Activity>> GetActivitiesByDateAsync(DateTime date)
         {
             var startDate = date.Date;
             var endDate = startDate.AddDays(1);
@@ -26,28 +25,28 @@ namespace TaskFlow.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Activity?> GetActivityByIdAsync(int id)
+        public async System.Threading.Tasks.Task<Activity?> GetActivityByIdAsync(int id)
         {
             return await _context.Activities
                 .Include(a => a.Tasks)
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        public async Task<Activity> CreateActivityAsync(Activity activity)
+        public async System.Threading.Tasks.Task<Activity> CreateActivityAsync(Activity activity)
         {
             _context.Activities.Add(activity);
             await SaveChangesAsync();
             return activity;
         }
 
-        public async Task<Activity> UpdateActivityAsync(Activity activity)
+        public async System.Threading.Tasks.Task<Activity> UpdateActivityAsync(Activity activity)
         {
             _context.Activities.Update(activity);
             await SaveChangesAsync();
             return activity;
         }
 
-        public async Task<bool> DeleteActivityAsync(int id)
+        public async System.Threading.Tasks.Task<bool> DeleteActivityAsync(int id)
         {
             var activity = await GetActivityByIdAsync(id);
             if (activity == null) return false;
@@ -57,10 +56,9 @@ namespace TaskFlow.Infrastructure.Repositories
             return true;
         }
 
-        public async Task SaveChangesAsync()
+        public async System.Threading.Tasks.Task SaveChangesAsync()
         {
-            await Task.CompletedTask;
-            await _context.SaveChangesAsync();  
+            await _context.SaveChangesAsync();
         }
     }
 }
