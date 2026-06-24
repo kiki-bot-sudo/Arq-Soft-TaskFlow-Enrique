@@ -6,15 +6,21 @@ using Task = TaskFlow.Domain.Models.Task;
 
 namespace TaskFlow.Infrastructure.Repositories
 {
-    public class TaskRepository : ITaskRepository
+    /// <summary>
+    /// Repositorio para la entidad Task.
+    /// Maneja operaciones CRUD y consultas específicas de tareas.
+    /// </summary>
+    public class TaskRepository : BaseRepository<Task>, ITaskRepository
     {
-        private readonly TaskFlowDbContext _context;
-
-        public TaskRepository(TaskFlowDbContext context)
+        public TaskRepository(TaskFlowDbContext context) : base(context)
         {
-            _context = context;
         }
 
+        /// <summary>
+        /// Obtiene todas las tareas asociadas a una actividad específica.
+        /// </summary>
+        /// <param name="activityId">ID de la actividad</param>
+        /// <returns>Lista de tareas</returns>
         public async Task<IEnumerable<Task>> GetTasksByActivityAsync(int activityId)
         {
             return await _context.Tasks
@@ -22,6 +28,11 @@ namespace TaskFlow.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Obtiene una tarea por ID con su actividad relacionada.
+        /// </summary>
+        /// <param name="id">ID de la tarea</param>
+        /// <returns>Tarea con su actividad, o null si no existe</returns>
         public async Task<Task?> GetTaskByIdAsync(int id)
         {
             return await _context.Tasks
@@ -29,33 +40,43 @@ namespace TaskFlow.Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
+        /// <summary>
+        /// Crea una nueva tarea.
+        /// </summary>
+        /// <param name="task">Tarea a crear</param>
+        /// <returns>Tarea creada</returns>
         public async Task<Task> CreateTaskAsync(Task task)
         {
-            _context.Tasks.Add(task);
+            await AddAsync(task);
             await SaveChangesAsync();
             return task;
         }
 
+        /// <summary>
+        /// Actualiza una tarea existente.
+        /// </summary>
+        /// <param name="task">Tarea con datos actualizados</param>
+        /// <returns>Tarea actualizada</returns>
         public async Task<Task> UpdateTaskAsync(Task task)
         {
-            _context.Tasks.Update(task);
+            Update(task);
             await SaveChangesAsync();
             return task;
         }
 
+        /// <summary>
+        /// Elimina una tarea por ID.
+        /// </summary>
+        /// <param name="id">ID de la tarea a eliminar</param>
+        /// <returns>true si se eliminó exitosamente, false si no existe</returns>
         public async Task<bool> DeleteTaskAsync(int id)
         {
             var task = await GetTaskByIdAsync(id);
             if (task == null) return false;
 
-            _context.Tasks.Remove(task);
+            Delete(task);
             await SaveChangesAsync();
             return true;
-        }
-
-        public async System.Threading.Tasks.Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
         }
     }
 }
