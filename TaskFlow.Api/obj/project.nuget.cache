@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "eHJqsNOC5rI=",
+  "dgSpecHash": "gbKELim3OGA=",
   "success": true,
-  "projectFilePath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Api\\TaskFlow.Api.csproj",
+  "projectFilePath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Api\\TaskFlow.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\enriq\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\enriq\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
@@ -90,9 +90,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "TaskFlow.Api depende de Swashbuckle.AspNetCore (>= 6.4.6), pero no se encontró Swashbuckle.AspNetCore 6.4.6. Swashbuckle.AspNetCore 6.5.0 se resolvió en su lugar.",
-      "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Api\\TaskFlow.Api.csproj",
+      "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Api\\TaskFlow.Api.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Api\\TaskFlow.Api.csproj",
+      "filePath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Api\\TaskFlow.Api.csproj",
       "libraryId": "Swashbuckle.AspNetCore",
       "targetGraphs": [
         "net8.0"

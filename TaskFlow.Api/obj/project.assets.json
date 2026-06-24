@@ -4466,11 +4466,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Api\\TaskFlow.Api.csproj",
+      "projectUniqueName": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Api\\TaskFlow.Api.csproj",
       "projectName": "TaskFlow.Api",
-      "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Api\\TaskFlow.Api.csproj",
+      "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Api\\TaskFlow.Api.csproj",
       "packagesPath": "C:\\Users\\enriq\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Api\\obj\\",
+      "outputPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -4492,14 +4492,14 @@
           "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Application\\TaskFlow.Application.csproj": {
-              "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Application\\TaskFlow.Application.csproj"
+            "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Application\\TaskFlow.Application.csproj": {
+              "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Application\\TaskFlow.Application.csproj"
             },
-            "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Domain\\TaskFlow.Domain.csproj": {
-              "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Domain\\TaskFlow.Domain.csproj"
+            "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Domain\\TaskFlow.Domain.csproj": {
+              "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Domain\\TaskFlow.Domain.csproj"
             },
-            "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Infrastructure\\TaskFlow.Infrastructure.csproj": {
-              "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Infrastructure\\TaskFlow.Infrastructure.csproj"
+            "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Infrastructure\\TaskFlow.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Infrastructure\\TaskFlow.Infrastructure.csproj"
             }
           }
         }

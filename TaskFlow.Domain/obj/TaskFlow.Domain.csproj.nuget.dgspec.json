@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Domain\\TaskFlow.Domain.csproj": {}
+    "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Domain\\TaskFlow.Domain.csproj": {}
   },
   "projects": {
-    "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Domain\\TaskFlow.Domain.csproj": {
+    "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Domain\\TaskFlow.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Domain\\TaskFlow.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Domain\\TaskFlow.Domain.csproj",
         "projectName": "TaskFlow.Domain",
-        "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Domain\\TaskFlow.Domain.csproj",
+        "projectPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Domain\\TaskFlow.Domain.csproj",
         "packagesPath": "C:\\Users\\enriq\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Domain\\obj\\",
+        "outputPath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

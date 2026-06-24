@@ -1,0 +1,12 @@
+# Visual Studio e IDEs
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Carpetas de Compilación
+**/bin/
+**/obj/
+
+# Configuraciones locales de desarrollo
+appsettings.Development.json

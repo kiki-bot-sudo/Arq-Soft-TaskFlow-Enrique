@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "th1zOqgZPD8=",
+  "dgSpecHash": "mUT/MWSxFyY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enriqu\\TaskFlow.Infrastructure\\TaskFlow.Infrastructure.csproj",
+  "projectFilePath": "C:\\Users\\enriq\\source\\repos\\Arq-Soft-TaskFlow-Enrique\\TaskFlow.Infrastructure\\TaskFlow.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\enriq\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\enriq\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
