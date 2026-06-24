@@ -1,22 +1,39 @@
 using TaskFlow.Application.Interfaces;
+using TaskFlow.Application.Strategies;
 using TaskFlow.Domain.Models;
 using TaskFlow.Infrastructure.Interfaces;
 
 namespace TaskFlow.Application.Services
 {
+    /// <summary>
+    /// Servicio de actividades.
+    /// Usa el patrón Strategy para el ordenamiento de actividades,
+    /// permitiendo cambiar el criterio de orden sin modificar este servicio.
+    /// </summary>
     public class ActivityService : IActivityService
     {
         private readonly IActivityRepository _repository;
+        private IActivitySortStrategy _sortStrategy;
 
         public ActivityService(IActivityRepository repository)
         {
             _repository = repository;
+            // Estrategia por defecto: ordenar por prioridad descendente
+            _sortStrategy = new PriorityDescSortStrategy();
+        }
+
+        /// <summary>
+        /// Cambia la estrategia de ordenamiento en tiempo de ejecución.
+        /// </summary>
+        public void SetSortStrategy(IActivitySortStrategy strategy)
+        {
+            _sortStrategy = strategy;
         }
 
         public async Task<IEnumerable<Activity>> GetActivitiesByDateAsync(DateTime date)
         {
             var activities = await _repository.GetActivitiesByDateAsync(date);
-            return activities.OrderByDescending(a => a.Priority == "High" ? 0 : a.Priority == "Normal" ? 1 : 2);
+            return _sortStrategy.Sort(activities);
         }
 
         public async Task<Activity?> GetActivityByIdAsync(int id)
