@@ -1,36 +1,43 @@
-# ADR-01: [Título corto de la decisión]
+# ADR-01: Arquitectura en Capas con ASP.NET Core para TaskFlow
 
 | Campo  | Valor |
 |--------|-------|
-| Autor  | [Nombre Apellido] |
-| Fecha  | DD/MM/AAAA |
-| Estado | `Propuesto` · `Aceptado` · `Rechazado` · `Reemplazado por ADR-NN` |
+| Autor  | Enrique Zavala |
+| Fecha  | 01/06/2026 |
+| Estado | `Reemplazado por ADR-02` |
 
 ---
 
 ## Contexto
 
-¿Qué estás construyendo, qué problema resuelve y para quién es? Describe también las condiciones o restricciones que influyeron en esta decisión — por ejemplo, el tiempo disponible, el equipo, las tecnologías que ya conoces o las que viste en clase.
+TaskFlow es una aplicación de gestión de tareas personales dirigida a estudiantes universitarios. El objetivo es permitir registrar actividades diarias con sus tareas asociadas, asignarles prioridad y marcarlas como completadas.
+
+El proyecto se desarrolla de forma individual, con tiempo limitado y usando tecnologías vistas en clase. Se requería una arquitectura que fuera comprensible, mantenible y que permitiera crecer hacia una API REST en fases posteriores.
 
 ---
 
 ## Decisión
 
-¿Qué decidiste? Sé específico: nombra la tecnología, el patrón o el estilo arquitectónico que elegiste.
+Se adopta una **arquitectura en capas (Layered Architecture)** con los siguientes componentes:
+
+- **Domain**: Modelos de entidad (, )
+- **Infrastructure**: Repositorios y acceso a datos con Entity Framework Core
+- **Application**: Servicios con la lógica de negocio
+- **API**: Controladores REST (fase siguiente)
+
+Stack tecnológico: **C# + ASP.NET Core 8 + Entity Framework Core + SQL Server**
 
 ### ¿Por qué?
 
-Argumenta tu decisión. No basta con decir "es lo que vimos en clase" — explica qué característica concreta de lo que elegiste resuelve tu problema.
+La arquitectura en capas separa claramente las responsabilidades: el dominio no depende de la base de datos, y los servicios no conocen los detalles HTTP. Esto permite que en la siguiente fase se agregue una capa API sin modificar la lógica existente.
 
 ### Alternativas consideradas
 
-*(Mínimo 3 filas)*
-
 | Alternativa | Por qué la descarté |
 |-------------|---------------------|
-| ...         | ...                 |
-| ...         | ...                 |
-| ...         | ...                 |
+| Arquitectura monolítica sin capas | Dificulta el mantenimiento y mezcla responsabilidades |
+| Arquitectura hexagonal (Ports & Adapters) | Mayor complejidad para el alcance del proyecto |
+| Minimal API sin capas | No escala bien cuando la lógica de negocio crece |
 
 ---
 
@@ -38,18 +45,21 @@ Argumenta tu decisión. No basta con decir "es lo que vimos en clase" — explic
 
 **✅ Lo que gano:**
 
-Menciona al menos:
-- Una consecuencia **técnica** — qué se vuelve más fácil de construir, mantener o escalar en tu sistema
-- Una consecuencia sobre el **proceso o el equipo** — cómo afecta la forma en que vas a trabajar
+- Separación clara de responsabilidades: cada capa tiene un rol definido
+- Facilidad para agregar una capa API REST sin tocar el dominio ni los servicios
 
 **⚠️ Lo que sacrifico o asumo:**
 
-Menciona al menos:
-- Una **limitación técnica** — qué no podrás hacer fácilmente con esta decisión
-- Una **deuda o riesgo** — qué podrías tener que resolver más adelante si el proyecto crece
+- Más archivos y proyectos desde el inicio (mayor setup)
+- Si el proyecto no crece, la separación en capas puede ser overhead innecesario
 
 ## Diagrama
 
-Un boceto de cómo se estructura tu sistema (draw.io, Mermaid o a mano escaneado)
-
-![Diagrama del sistema]( ./ruta/diagrama-nivel-1.png )
+```mermaid
+graph TD
+    A[Cliente / Prueba] --> B[Application - Services]
+    B --> C[Infrastructure - Repositories]
+    C --> D[(SQL Server - EF Core)]
+    B --> E[Domain - Models]
+    C --> E
+```
