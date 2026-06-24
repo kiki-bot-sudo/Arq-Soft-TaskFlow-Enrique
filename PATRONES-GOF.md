@@ -1,31 +1,19 @@
 # Patrones de Diseño GoF — TaskFlow API
 
-| Patrón | Categoría | Archivos |
-|--------|-----------|----------|
-| Strategy | Comportamiento | `TaskFlow.Application/Strategies/` |
-| Builder  | Creación       | `TaskFlow.Domain/Builders/`        |
+| # | Patrón | Categoría | Archivos principales |
+|---|--------|-----------|----------------------|
+| 1 | Strategy  | Comportamiento | `TaskFlow.Application/Strategies/` |
+| 2 | Builder   | Creación       | `TaskFlow.Domain/Builders/` |
+| 3 | Decorator | Estructural    | `TaskFlow.Application/Decorators/` |
+| 4 | Observer  | Comportamiento | `TaskFlow.Application/Observers/` |
 
 ---
 
 ## Patrón 1: Strategy
 
-**Problema que resuelve:** El ordenamiento de actividades estaba hardcodeado dentro de `ActivityService`. Si se quería otro criterio de orden había que modificar el servicio directamente, violando el principio Open/Closed.
+**Problema:** El ordenamiento de actividades estaba hardcodeado en `ActivityService`.
 
-**Solución:** Se extrae el algoritmo de ordenamiento a una interfaz `IActivitySortStrategy`. Cada implementación concreta encapsula un criterio distinto. El servicio solo conoce la interfaz.
-
-### Estructura
-
-```
-IActivitySortStrategy          ← Contrato (interfaz)
-  ├── PriorityDescSortStrategy ← Ordena High > Normal > Low
-  └── DateAscSortStrategy      ← Ordena cronológicamente
-
-ActivityService
-  └── usa IActivitySortStrategy (por defecto: PriorityDesc)
-      └── SetSortStrategy() permite cambiarla en runtime
-```
-
-### Diagrama
+**Solución:** Se extrae el algoritmo a `IActivitySortStrategy`. El servicio delega el ordenamiento a la estrategia activa, que puede cambiarse en runtime.
 
 ```mermaid
 classDiagram
@@ -33,121 +21,134 @@ classDiagram
         <<interface>>
         +Sort(activities) IEnumerable~Activity~
     }
-    class PriorityDescSortStrategy {
-        +Sort(activities) IEnumerable~Activity~
-    }
-    class DateAscSortStrategy {
-        +Sort(activities) IEnumerable~Activity~
-    }
+    class PriorityDescSortStrategy { +Sort() }
+    class DateAscSortStrategy { +Sort() }
     class ActivityService {
         -IActivitySortStrategy _sortStrategy
         +SetSortStrategy(strategy)
-        +GetActivitiesByDateAsync(date)
     }
-
     IActivitySortStrategy <|.. PriorityDescSortStrategy
     IActivitySortStrategy <|.. DateAscSortStrategy
-    ActivityService --> IActivitySortStrategy : usa
+    ActivityService --> IActivitySortStrategy : delega
 ```
 
-### Antes vs Después
+**Antes:** `activities.OrderByDescending(a => a.Priority == "High" ? 0 : 1)`
 
-**Antes** (hardcodeado en el servicio):
-```csharp
-return activities.OrderByDescending(a => a.Priority == "High" ? 0 : a.Priority == "Normal" ? 1 : 2);
-```
-
-**Después** (Strategy):
-```csharp
-// En ActivityService
-return _sortStrategy.Sort(activities);
-
-// Para cambiar el criterio desde fuera:
-service.SetSortStrategy(new DateAscSortStrategy());
-```
+**Después:** `_sortStrategy.Sort(activities)` — intercambiable sin tocar el servicio.
 
 ---
 
 ## Patrón 2: Builder
 
-**Problema que resuelve:** Los controladores construían entidades (`Activity`, `Task`) asignando propiedades una a una directamente. Esto es propenso a errores (olvidar campos, valores nulos) y hace el código difícil de leer.
+**Problema:** Los controladores construían entidades manualmente propiedad a propiedad.
 
-**Solución:** Se crean `ActivityBuilder` y `TaskBuilder` que encadenan la construcción paso a paso y aplican valores por defecto automáticamente (`CreatedAt`).
-
-### Estructura
-
-```
-ActivityBuilder
-  .WithTitle()
-  .WithDescription()
-  .WithDate()
-  .WithCategory()
-  .WithPriority()
-  .Build() → Activity
-
-TaskBuilder
-  .WithActivityId()
-  .WithTitle()
-  .WithDescription()
-  .WithDueTime()
-  .Build() → Task
-```
-
-### Diagrama
+**Solución:** `ActivityBuilder` y `TaskBuilder` encadenan la construcción y asignan `CreatedAt` automáticamente.
 
 ```mermaid
 classDiagram
     class ActivityBuilder {
-        -Activity _activity
-        +WithTitle(title) ActivityBuilder
-        +WithDescription(desc) ActivityBuilder
-        +WithDate(date) ActivityBuilder
-        +WithCategory(cat) ActivityBuilder
-        +WithPriority(priority) ActivityBuilder
+        +WithTitle() ActivityBuilder
+        +WithDate() ActivityBuilder
+        +WithPriority() ActivityBuilder
         +Build() Activity
     }
     class TaskBuilder {
-        -Task _task
-        +WithActivityId(id) TaskBuilder
-        +WithTitle(title) TaskBuilder
-        +WithDescription(desc) TaskBuilder
-        +WithDueTime(time) TaskBuilder
+        +WithActivityId() TaskBuilder
+        +WithTitle() TaskBuilder
+        +WithDueTime() TaskBuilder
         +Build() Task
     }
-    class ActivityController {
-        +CreateActivity(dto)
-    }
-    class TaskController {
-        +CreateTask(activityId, dto)
-    }
-
     ActivityController --> ActivityBuilder : usa
     TaskController --> TaskBuilder : usa
-    ActivityBuilder --> Activity : construye
-    TaskBuilder --> Task : construye
 ```
 
-### Antes vs Después
+**Antes:** `var activity = new Activity { Title = dto.Title, ... };`
 
-**Antes** (manual en el controlador):
-```csharp
-var activity = new Activity
-{
-    Title = dto.Title,
-    Description = dto.Description,
-    Date = dto.Date,
-    Category = dto.Category,
-    Priority = dto.Priority ?? "Normal"
-};
+**Después:** `new ActivityBuilder().WithTitle(dto.Title).WithPriority("High").Build();`
+
+---
+
+## Patrón 3: Decorator
+
+**Problema:** Se necesitaba logging en `ActivityService` sin modificar su código ni violar responsabilidad única.
+
+**Solución:** `LoggingActivityServiceDecorator` implementa `IActivityService` y envuelve al servicio real. Los controladores reciben exactamente el mismo contrato — no saben que hay un decorator.
+
+```mermaid
+classDiagram
+    class IActivityService { <<interface>> }
+    class ActivityService { }
+    class LoggingActivityServiceDecorator {
+        -IActivityService _inner
+        -ILogger _logger
+    }
+    class ActivityController {
+        -IActivityService _activityService
+    }
+    IActivityService <|.. ActivityService
+    IActivityService <|.. LoggingActivityServiceDecorator
+    LoggingActivityServiceDecorator --> ActivityService : envuelve
+    ActivityController --> IActivityService : no sabe cual
 ```
 
-**Después** (Builder):
+**Registro en Program.cs:**
 ```csharp
-var activity = new ActivityBuilder()
-    .WithTitle(dto.Title)
-    .WithDescription(dto.Description)
-    .WithDate(dto.Date)
-    .WithCategory(dto.Category)
-    .WithPriority(dto.Priority ?? "Normal")
-    .Build();
+var realService = new ActivityService(repo);
+return new LoggingActivityServiceDecorator(realService, logger);
+```
+
+**Output en consola:**
+```
+[INFO] [ActivityService] CreateActivity: "Estudiar Arquitectura"
+[INFO] [ActivityService] Created with Id: 7
+```
+
+---
+
+## Patrón 4: Observer
+
+**Problema:** Al completar una tarea no había forma de reaccionar al evento. Agregar esa lógica en `TaskService` acoplaría responsabilidades.
+
+**Solución:** `TaskService` actúa como **Sujeto** y notifica observadores tras cada `UpdateTaskAsync`. `ActivityCompletionObserver` revisa si todas las tareas de la actividad están completas y auto-marca la actividad (o la reabre si se des-completa).
+
+```mermaid
+classDiagram
+    class ITaskObserver {
+        <<interface>>
+        +OnTaskUpdatedAsync(task)
+    }
+    class ActivityCompletionObserver {
+        +OnTaskUpdatedAsync(task)
+    }
+    class TaskService {
+        -List~ITaskObserver~ _observers
+        +AddObserver(observer)
+        +UpdateTaskAsync(task)
+        -NotifyObserversAsync(task)
+    }
+    ITaskObserver <|.. ActivityCompletionObserver
+    TaskService --> ITaskObserver : notifica
+```
+
+**Flujo:**
+```mermaid
+sequenceDiagram
+    participant TC as TaskController
+    participant TS as TaskService (Sujeto)
+    participant OBS as ActivityCompletionObserver
+    participant DB as Base de Datos
+
+    TC->>TS: UpdateTaskAsync(IsCompleted=true)
+    TS->>DB: UPDATE Tasks
+    TS->>OBS: OnTaskUpdatedAsync(task)
+    OBS->>DB: GET todas las tareas de la actividad
+    OBS->>DB: Todas completas → UPDATE activity.IsCompleted=true
+    TS-->>TC: task actualizada
+```
+
+**Registro en Program.cs:**
+```csharp
+var service = new TaskService(repo);
+service.AddObserver(sp.GetRequiredService<ActivityCompletionObserver>());
+return service;
 ```
