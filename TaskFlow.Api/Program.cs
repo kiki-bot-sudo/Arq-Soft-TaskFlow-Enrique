@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using TaskFlow.Application.Decorators;
 using TaskFlow.Application.Interfaces;
+using TaskFlow.Application.Observers;
 using TaskFlow.Application.Services;
+using TaskFlow.Application.Strategies;
 using TaskFlow.Infrastructure.Data;
 using TaskFlow.Infrastructure.Interfaces;
 using TaskFlow.Infrastructure.Repositories;
@@ -9,11 +12,9 @@ using TaskFlow.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger with documentation
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -21,56 +22,62 @@ builder.Services.AddSwaggerGen(options =>
         Title = "TaskFlow API",
         Version = "v1",
         Description = "API RESTful para gestión de tareas y actividades. " +
-                     "Desarrollada con Clean Architecture utilizando .NET 8, " +
-                     "Entity Framework Core y SQL Server.",
-        Contact = new OpenApiContact
-        {
-            Name = "TaskFlow Team",
-            Email = "support@taskflow.com"
-        }
+                     "Patrones GoF aplicados: Strategy, Builder, Decorator, Observer.",
+        Contact = new OpenApiContact { Name = "Enrique Zavala" }
     });
 
-    // Incluir comentarios XML en la documentación
     var xmlFile = "TaskFlow.Api.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
-    {
-        options.IncludeXmlComments(xmlPath);
-    }
+    if (File.Exists(xmlPath)) options.IncludeXmlComments(xmlPath);
 });
 
-// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
-// Add Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<TaskFlowDbContext>(options =>
-    options.UseSqlServer(connectionString)
-);
+    options.UseSqlServer(connectionString));
 
-// Add Application Services
-builder.Services.AddScoped<IActivityService, ActivityService>();
-builder.Services.AddScoped<ITaskService, TaskService>();
-
-// Add Infrastructure Repositories
+// Repositories
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 
-// Add Logging
+// Observer: registrado como scoped para poder inyectarse
+builder.Services.AddScoped<ActivityCompletionObserver>();
+
+// TaskService con Observer inyectado via factory
+builder.Services.AddScoped<ITaskService>(sp =>
+{
+    var repo = sp.GetRequiredService<ITaskRepository>();
+    var service = new TaskService(repo);
+
+    // Registrar el observador de completado automático
+    var observer = sp.GetRequiredService<ActivityCompletionObserver>();
+    service.AddObserver(observer);
+
+    return service;
+});
+
+// ActivityService con Decorator de logging encima
+builder.Services.AddScoped<IActivityService>(sp =>
+{
+    var repo = sp.GetRequiredService<IActivityRepository>();
+    var logger = sp.GetRequiredService<ILogger<LoggingActivityServiceDecorator>>();
+
+    // Servicio real (con Strategy por defecto: PriorityDesc)
+    var realService = new ActivityService(repo);
+
+    // Decorator envuelve el servicio real añadiendo logging
+    return new LoggingActivityServiceDecorator(realService, logger);
+});
+
 builder.Services.AddLogging();
 
 var app = builder.Build();
 
-// Configure middleware
-// Registrar middleware de manejo de excepciones global
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -79,7 +86,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskFlow API v1");
-        options.RoutePrefix = string.Empty; // Acceder a Swagger en la raíz
+        options.RoutePrefix = string.Empty;
     });
 }
 
