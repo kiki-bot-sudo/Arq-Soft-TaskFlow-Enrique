@@ -2,6 +2,11 @@
 
 API RESTful para gestión de actividades y tareas personales. Desarrollada con ASP.NET Core 8 + arquitectura en capas + patrones GoF.
 
+## 📐 Arquitectura (Modelo C4)
+
+Documentación de la arquitectura en 3 niveles (Contexto, Contenedores, Componentes),
+versionada como código Mermaid: 👉 [docs/C4-TaskFlow.md](docs/C4-TaskFlow.md)
+
 ---
 
 ## Requisitos
