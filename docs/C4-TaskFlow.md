@@ -70,3 +70,71 @@ C4Container
   gestionada con migraciones de EF Core (`TaskFlow.Infrastructure/Migrations`).
 - No existe todavía un contenedor de frontend (SPA/móvil) en el repositorio; el consumo
   se hace hoy vía Swagger UI, servido dentro del mismo contenedor del API.
+
+---
+
+## Nivel 3 — Componentes
+
+**Para quién es:** desarrolladores que van a trabajar dentro del contenedor `TaskFlow.Api`.
+**Pregunta que responde:** ¿qué piezas hay dentro del contenedor principal, cómo se
+comunican, y qué patrones GoF ya están implementados?
+
+```mermaid
+C4Component
+    title Diagrama de Componentes — dentro de TaskFlow.Api
+
+    Person(usuario, "Usuario", "Vía HTTP/Swagger")
+
+    Container_Boundary(api, "TaskFlow.Api") {
+        Component(activityCtrl, "ActivityController", "ASP.NET Controller", "Endpoints REST de actividades. Usa ActivityBuilder para construir la entidad desde el DTO.")
+        Component(taskCtrl, "TaskController", "ASP.NET Controller", "Endpoints REST de tareas. Usa TaskBuilder para construir la entidad desde el DTO.")
+        Component(exMiddleware, "GlobalExceptionMiddleware", "Middleware", "Captura excepciones no controladas y responde con un error HTTP consistente.")
+
+        Component(builders, "ActivityBuilder / TaskBuilder", "GoF Builder", "Construyen instancias de Activity/Task paso a paso a partir de los DTOs de entrada.")
+
+        Component(decorator, "LoggingActivityServiceDecorator", "GoF Decorator", "Envuelve a ActivityService agregando logging antes/después de cada operación, sin modificarlo.")
+        Component(activityService, "ActivityService", "Application Service", "Lógica de negocio de actividades. Usa una IActivitySortStrategy para ordenar resultados.")
+        Component(strategy, "IActivitySortStrategy\n(PriorityDescSortStrategy / DateAscSortStrategy)", "GoF Strategy", "Algoritmos intercambiables de ordenamiento de actividades.")
+
+        Component(taskService, "TaskService", "Application Service", "Lógica de negocio de tareas. Actúa como Sujeto del patrón Observer.")
+        Component(observer, "ActivityCompletionObserver", "GoF Observer", "Al actualizarse una tarea, revisa si todas las tareas de la actividad están completas y auto-completa/reabre la actividad.")
+
+        Component(activityRepo, "ActivityRepository", "Infrastructure Repository", "Acceso a datos de Activity vía EF Core.")
+        Component(taskRepo, "TaskRepository", "Infrastructure Repository", "Acceso a datos de Task vía EF Core.")
+        Component(dbContext, "TaskFlowDbContext", "EF Core DbContext", "Mapeo objeto-relacional de Activity y Task.")
+    }
+
+    ContainerDb(db, "TaskFlowDb", "SQL Server", "Base de datos relacional")
+
+    Rel(usuario, activityCtrl, "HTTP", "REST/JSON")
+    Rel(usuario, taskCtrl, "HTTP", "REST/JSON")
+    Rel(activityCtrl, builders, "Construye entidad con")
+    Rel(taskCtrl, builders, "Construye entidad con")
+    Rel(activityCtrl, decorator, "Llama a IActivityService (resuelto como)")
+    Rel(decorator, activityService, "Delega en (envuelve)")
+    Rel(activityService, strategy, "Ordena resultados con")
+    Rel(taskCtrl, taskService, "Llama a ITaskService")
+    Rel(taskService, observer, "Notifica al actualizar una tarea")
+    Rel(observer, taskRepo, "Consulta tareas de la actividad")
+    Rel(activityService, activityRepo, "Usa")
+    Rel(taskService, taskRepo, "Usa")
+    Rel(observer, activityRepo, "Auto-completa/reabre actividad")
+    Rel(activityRepo, dbContext, "Usa")
+    Rel(taskRepo, dbContext, "Usa")
+    Rel(dbContext, db, "EF Core", "SQL")
+```
+
+### Notas del Nivel 3
+
+- Los **4 patrones GoF** implementados en el proyecto (documentados también en
+  `PATRONES-GOF.md` y `ADR-03`) quedan explícitos como componentes:
+  - **Builder** (`ActivityBuilder`, `TaskBuilder`) — construcción de entidades desde DTOs.
+  - **Strategy** (`IActivitySortStrategy`) — algoritmo de orden intercambiable en tiempo de ejecución.
+  - **Decorator** (`LoggingActivityServiceDecorator`) — logging transversal sin tocar `ActivityService`.
+  - **Observer** (`ActivityCompletionObserver`) — auto-completado de actividades reaccionando a cambios en sus tareas.
+- `GlobalExceptionMiddleware` es transversal a todos los controllers (no se dibujó cada
+  relación individual para no saturar el diagrama).
+- Las flechas de `Controller → Service` respetan la inyección de dependencias real
+  configurada en `Program.cs`: `ActivityController` recibe `IActivityService`, cuya
+  implementación registrada en el contenedor DI es el `Decorator`, que a su vez envuelve
+  al `ActivityService` real.
