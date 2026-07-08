@@ -138,3 +138,20 @@ C4Component
   configurada en `Program.cs`: `ActivityController` recibe `IActivityService`, cuya
   implementación registrada en el contenedor DI es el `Decorator`, que a su vez envuelve
   al `ActivityService` real.
+
+---
+
+## Declaración de uso de IA
+
+Para esta entrega usé **Claude (Anthropic)** como apoyo para:
+
+- Explorar y entender el código real del repositorio (controllers, services, patrones GoF
+  ya implementados) antes de modelarlo, en lugar de generar diagramas genéricos.
+- Redactar la sintaxis Mermaid (`C4Context`, `C4Container`, `C4Component`) de los tres
+  niveles a partir de esa arquitectura real.
+- Redactar las notas explicativas de cada nivel.
+
+La revisión de que el contenido de cada diagrama corresponda fielmente al código del
+proyecto (nombres de clases, relaciones de inyección de dependencias, patrones aplicados)
+la hice yo, comparándolo contra el código fuente en `TaskFlow.Api`, `TaskFlow.Application`,
+`TaskFlow.Domain` e `TaskFlow.Infrastructure`.
