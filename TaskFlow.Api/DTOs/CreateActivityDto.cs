@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using TaskFlow.Domain.Models;
 
 namespace TaskFlow.Api.DTOs
 {
@@ -18,7 +19,7 @@ namespace TaskFlow.Api.DTOs
         [MaxLength(50, ErrorMessage = "La categoría no puede superar 50 caracteres.")]
         public string Category { get; set; } = string.Empty;
 
-        [RegularExpression("^(Low|Normal|High)$", ErrorMessage = "La prioridad debe ser Low, Normal o High.")]
+        [RegularExpression(PriorityLevels.ValidationPattern, ErrorMessage = "La prioridad debe ser Low, Normal o High.")]
         public string? Priority { get; set; }
     }
 }

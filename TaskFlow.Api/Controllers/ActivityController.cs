@@ -64,7 +64,7 @@ namespace TaskFlow.Api.Controllers
                 .WithDescription(dto.Description)
                 .WithDate(dto.Date)
                 .WithCategory(dto.Category)
-                .WithPriority(dto.Priority ?? "Normal")
+                .WithPriority(dto.Priority ?? PriorityLevels.Normal)
                 .Build();
 
             var created = await _activityService.CreateActivityAsync(activity);
@@ -90,7 +90,11 @@ namespace TaskFlow.Api.Controllers
             return Ok(updated);
         }
 
-        /// <summary>Elimina una actividad y sus tareas asociadas.</summary>
+        /// <summary>
+        /// Elimina una actividad. Sus tareas asociadas se eliminan en cascada
+        /// por la configuración OnDelete(DeleteBehavior.Cascade) en TaskFlowDbContext,
+        /// no por lógica explícita en este método (ver ADR-04).
+        /// </summary>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -31,10 +31,26 @@ builder.Services.AddSwaggerGen(options =>
     if (File.Exists(xmlPath)) options.IncludeXmlComments(xmlPath);
 });
 
+// CORS: en Development se permite cualquier origen para facilitar pruebas locales.
+// En otros entornos se restringe a los orígenes configurados en "AllowedCorsOrigins"
+// (appsettings.json), ya que AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() sin
+// restricción es un riesgo de seguridad en producción (ver ADR-04).
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    options.AddPolicy("Default", policy =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        }
+        else
+        {
+            var allowedOrigins = builder.Configuration
+                .GetSection("AllowedCorsOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+            policy.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader();
+        }
+    });
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -91,7 +107,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("Default");
 app.UseAuthorization();
 app.MapControllers();
 

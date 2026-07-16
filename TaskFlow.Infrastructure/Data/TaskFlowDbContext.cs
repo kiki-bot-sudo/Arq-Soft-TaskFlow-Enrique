@@ -34,7 +34,7 @@ namespace TaskFlow.Infrastructure.Data
                     Id = 1, Title = "Estudiar Arquitectura de Software",
                     Description = "Repasar patrones GoF y ADRs",
                     Date = seedDate, Category = "Estudio",
-                    Priority = "High", IsCompleted = false,
+                    Priority = PriorityLevels.High, IsCompleted = false,
                     CreatedAt = seedDate
                 },
                 new Activity
@@ -42,7 +42,7 @@ namespace TaskFlow.Infrastructure.Data
                     Id = 2, Title = "Entregar proyecto TaskFlow",
                     Description = "Subir avances al repositorio",
                     Date = seedDate, Category = "Universidad",
-                    Priority = "High", IsCompleted = false,
+                    Priority = PriorityLevels.High, IsCompleted = false,
                     CreatedAt = seedDate
                 },
                 new Activity
@@ -50,7 +50,7 @@ namespace TaskFlow.Infrastructure.Data
                     Id = 3, Title = "Hacer ejercicio",
                     Description = "30 min cardio",
                     Date = seedDate, Category = "Salud",
-                    Priority = "Normal", IsCompleted = false,
+                    Priority = PriorityLevels.Normal, IsCompleted = false,
                     CreatedAt = seedDate
                 }
             );

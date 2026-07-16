@@ -18,7 +18,7 @@ namespace TaskFlow.Domain.Models
         public string Category { get; set; } = string.Empty;
 
         [MaxLength(10)]
-        public string Priority { get; set; } = "Normal"; // Low | Normal | High
+        public string Priority { get; set; } = PriorityLevels.Normal;
 
         public bool IsCompleted { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

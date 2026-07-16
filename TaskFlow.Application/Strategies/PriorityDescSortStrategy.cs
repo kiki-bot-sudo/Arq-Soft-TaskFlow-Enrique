@@ -8,16 +8,10 @@ namespace TaskFlow.Application.Strategies
     /// </summary>
     public class PriorityDescSortStrategy : IActivitySortStrategy
     {
-        private static readonly Dictionary<string, int> _order = new()
-        {
-            { "High", 0 },
-            { "Normal", 1 },
-            { "Low", 2 }
-        };
-
         public IEnumerable<Activity> Sort(IEnumerable<Activity> activities)
         {
-            return activities.OrderBy(a => _order.GetValueOrDefault(a.Priority, 1));
+            return activities.OrderBy(a =>
+                PriorityLevels.SortOrder.GetValueOrDefault(a.Priority, PriorityLevels.SortOrder[PriorityLevels.Normal]));
         }
     }
 }
