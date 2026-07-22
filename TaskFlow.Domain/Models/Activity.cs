@@ -1,7 +1,7 @@
+using Task = TaskFlow.Domain.Models.Task;
+
 namespace TaskFlow.Domain.Models
 {
-    using Task = TaskFlow.Domain.Models.Task;
-
     public class Activity
     {
         public int Id { get; set; }
