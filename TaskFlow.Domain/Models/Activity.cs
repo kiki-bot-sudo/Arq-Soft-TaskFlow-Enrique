@@ -1,5 +1,3 @@
-using Task = TaskFlow.Domain.Models.Task;
-
 namespace TaskFlow.Domain.Models
 {
     public class Activity
