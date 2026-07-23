@@ -1,5 +1,4 @@
-using TaskFlow.Domain.Models;
-
+using Task = TaskFlow.Domain.Models.Task;
 namespace TaskFlow.Domain.Builders
 {
     /// <summary>
