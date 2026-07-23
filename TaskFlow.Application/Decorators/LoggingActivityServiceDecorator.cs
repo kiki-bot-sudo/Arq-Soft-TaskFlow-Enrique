@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using TaskFlow.Application.Interfaces;
 using TaskFlow.Domain.Models;
 using Task = System.Threading.Tasks.Task;
@@ -38,7 +39,7 @@ namespace TaskFlow.Application.Decorators
 
         public async Task<Activity> CreateActivityAsync(Activity activity)
         {
-            _logger.LogInformation("[ActivityService] CreateActivity: "{Title}"", activity.Title);
+            _logger.LogInformation("[ActivityService] CreateActivity: {Title}", activity.Title);
             var result = await _inner.CreateActivityAsync(activity);
             _logger.LogInformation("[ActivityService] Created with Id: {Id}", result.Id);
             return result;
