@@ -68,6 +68,7 @@ namespace TaskFlow.Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "Activities",
                 columns: new[] { "Id", "Title", "Description", "Date", "Category", "Priority", "IsCompleted", "CreatedAt" },
+                columnTypes: new[] { "int", "nvarchar(100)", "nvarchar(500)", "datetime2", "nvarchar(50)", "nvarchar(10)", "bit", "datetime2" },
                 values: new object[,]
                 {
                     { 1, "Estudiar Arquitectura de Software", "Repasar patrones GoF y ADRs", new DateTime(2026, 6, 24, 0, 0, 0, DateTimeKind.Utc), "Estudio", "High", false, new DateTime(2026, 6, 24, 0, 0, 0, DateTimeKind.Utc) },
@@ -79,6 +80,7 @@ namespace TaskFlow.Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "Tasks",
                 columns: new[] { "Id", "ActivityId", "Title", "Description", "IsCompleted", "CreatedAt" },
+                columnTypes: new[] { "int", "int", "nvarchar(100)", "nvarchar(500)", "bit", "datetime2" },
                 values: new object[,]
                 {
                     { 1, 1, "Leer sobre Strategy Pattern", "Capítulo 5 del libro GoF", true, new DateTime(2026, 6, 24, 0, 0, 0, DateTimeKind.Utc) },

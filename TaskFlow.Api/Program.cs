@@ -137,21 +137,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("Frontend");
 app.UseAuthentication();
-app.Use(async (context, next) =>
-{
-    if ((context.Request.Path == "/" || context.Request.Path == "/index.html")
-        && context.User.Identity?.IsAuthenticated != true)
-    {
-        context.Response.Redirect("/login.html");
-        return;
-    }
-    await next();
-});
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
-app.MapFallbackToFile("index.html").RequireAuthorization();
+app.MapFallbackToFile("index.html");
 
 app.Run();

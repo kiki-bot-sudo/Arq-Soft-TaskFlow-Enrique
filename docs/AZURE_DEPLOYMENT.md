@@ -17,15 +17,16 @@ dotnet test TaskFlow.Tests --configuration Release --no-build
 
 ## 3. Recursos
 
-Crear un grupo de recursos, Azure SQL Server, Azure SQL Database y App Service para .NET 8. Un plan básico es suficiente para una demostración escolar.
+Para una demostración escolar sin costo se utiliza Static Web Apps Free, App Service F1 y la oferta gratuita de Azure SQL con pausa al alcanzar el límite.
 
 ```powershell
 az group create --name rg-taskflow --location centralus
-az appservice plan create --name plan-taskflow --resource-group rg-taskflow --sku B1 --is-linux
+az appservice plan create --name plan-taskflow --resource-group rg-taskflow --sku F1 --is-linux
 az webapp create --name <nombre-unico> --resource-group rg-taskflow --plan plan-taskflow --runtime "DOTNETCORE:8.0"
+az staticwebapp create --name <frontend-unico> --resource-group rg-taskflow --location centralus --sku Free
 ```
 
-Azure SQL puede crearse desde el portal para evitar exponer contraseñas en el historial de terminal.
+Al crear Azure SQL se debe confirmar `useFreeLimit=true` y `freeLimitExhaustionBehavior=AutoPause`. Si la suscripción no ofrece esas opciones, no continuar sin revisar el costo.
 
 ## 4. Configuración
 
@@ -52,9 +53,11 @@ La migración crea Identity, la relación de usuario y subtareas. Las tareas ant
 
 ```powershell
 dotnet publish TaskFlow.Api -c Release -o publish
-Compress-Archive -Path publish\* -DestinationPath taskflow.zip -Force
+tar -a -c -f taskflow.zip -C publish .
 az webapp deploy --resource-group rg-taskflow --name <nombre-unico> --src-path taskflow.zip --type zip
 ```
+
+En Windows no se recomienda `Compress-Archive` para un App Service Linux porque puede guardar separadores `\` dentro del ZIP. `tar -a` produce rutas `/` compatibles con Kudu.
 
 ### Visual Studio
 
@@ -79,11 +82,9 @@ Ejecutar manualmente `.github/workflows/azure-deploy.yml`.
 
 ## 8. URL y QR
 
-La URL será `https://<nombre-real>.azurewebsites.net`. Cuando exista:
+El QR debe apuntar al frontend de Static Web Apps:
 
 ```powershell
 python -m pip install "qrcode[pil]"
-.\scripts\generate-qr.ps1 -Url "https://<nombre-real>.azurewebsites.net"
+.\scripts\generate-qr.ps1 -Url "https://<frontend>.azurestaticapps.net"
 ```
-
-No se genera un QR hasta conocer y verificar la URL pública real.

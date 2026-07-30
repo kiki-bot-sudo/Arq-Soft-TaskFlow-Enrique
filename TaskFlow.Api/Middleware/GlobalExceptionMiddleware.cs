@@ -30,8 +30,14 @@ namespace TaskFlow.Api.Middleware
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            _logger.LogError(
+                exception,
+                "Error no controlado al procesar {Method} {Path}.",
+                context.Request.Method,
+                context.Request.Path);
+
             context.Response.ContentType = "application/json";
 
             var response = new ErrorResponse
