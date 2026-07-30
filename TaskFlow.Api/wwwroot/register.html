@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crear cuenta · TaskFlow</title><link rel="stylesheet" href="css/site.css"><link rel="stylesheet" href="css/auth.css"></head>
+<body class="auth-page" data-mode="register">
+  <main class="auth-shell">
+    <section class="auth-brand"><div class="brand-mark">TF</div><p class="eyebrow">TASKFLOW</p><h1>Empieza a organizarte.</h1><p>Crea tu cuenta y mantén tus tareas separadas y seguras.</p></section>
+    <section class="auth-card"><h2>Crear una cuenta</h2><p class="auth-intro">Solo necesitas unos datos.</p>
+      <form id="auth-form">
+        <label>Nombre<input id="display-name" maxlength="80" required autocomplete="name" placeholder="Tu nombre"></label>
+        <label>Correo electrónico<input id="email" type="email" autocomplete="email" required placeholder="nombre@correo.com"></label>
+        <label>Contraseña<div class="password-field"><input id="password" type="password" minlength="6" autocomplete="new-password" required><button type="button" id="toggle-password">Mostrar</button></div></label>
+        <small>Usa al menos 6 caracteres, mayúscula, minúscula y número.</small>
+        <label>Confirmar contraseña<input id="confirm-password" type="password" minlength="6" autocomplete="new-password" required></label>
+        <p id="auth-error" class="form-error" role="alert"></p><button class="primary auth-submit" type="submit">Crear cuenta</button>
+      </form><p class="auth-switch">¿Ya tienes cuenta? <a href="/login.html">Iniciar sesión</a></p>
+    </section>
+  </main><script src="js/auth.js"></script>
+</body>
+</html>

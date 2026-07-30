@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Iniciar sesión · TaskFlow</title><link rel="stylesheet" href="css/site.css"><link rel="stylesheet" href="css/auth.css"></head>
+<body class="auth-page" data-mode="login">
+  <main class="auth-shell">
+    <section class="auth-brand"><div class="brand-mark">TF</div><p class="eyebrow">TASKFLOW</p><h1>Organiza tus días con claridad.</h1><p>Tu agenda personal, sencilla y siempre disponible.</p></section>
+    <section class="auth-card"><h2>Bienvenido de nuevo</h2><p class="auth-intro">Ingresa para ver tus tareas.</p>
+      <form id="auth-form">
+        <label>Correo electrónico<input id="email" type="email" autocomplete="email" required placeholder="nombre@correo.com"></label>
+        <label>Contraseña<div class="password-field"><input id="password" type="password" autocomplete="current-password" required><button type="button" id="toggle-password">Mostrar</button></div></label>
+        <p id="auth-error" class="form-error" role="alert"></p><button class="primary auth-submit" type="submit">Iniciar sesión</button>
+      </form><p class="auth-switch">¿No tienes cuenta? <a href="/register.html">Crear cuenta</a></p>
+    </section>
+  </main><script src="js/auth.js"></script>
+</body>
+</html>
