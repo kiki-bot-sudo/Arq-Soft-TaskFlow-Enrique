@@ -11,6 +11,9 @@ namespace TaskFlow.Api.DTOs
         [MaxLength(500, ErrorMessage = "La descripción no puede superar 500 caracteres.")]
         public string Description { get; set; } = string.Empty;
 
+        [RegularExpression("^(Low|Medium|High)$", ErrorMessage = "La prioridad debe ser Low, Medium o High.")]
+        public string Priority { get; set; } = "Medium";
+
         public DateTime? DueTime { get; set; }
     }
 }

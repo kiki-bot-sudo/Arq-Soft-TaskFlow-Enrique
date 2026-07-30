@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using TaskFlow.Api.DTOs;
 using TaskFlow.Application.Interfaces;
 using TaskFlow.Domain.Builders;
@@ -12,6 +13,7 @@ namespace TaskFlow.Api.Controllers
     /// Usa el patrón Builder para construir instancias de Activity desde los DTOs.
     /// </summary>
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class ActivityController : ControllerBase
     {

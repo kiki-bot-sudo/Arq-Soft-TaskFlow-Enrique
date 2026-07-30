@@ -19,7 +19,7 @@ namespace TaskFlow.Tests.Services
         [Fact]
         public async SysTask UpdateTaskAsync_NotifiesAllObservers()
         {
-            var task = new DomainTask { Id = 1, ActivityId = 1, IsCompleted = true };
+            var task = new DomainTask { Id = 1, ActivityId = 1, Title = "Tarea", IsCompleted = true };
             _repoMock.Setup(r => r.UpdateTaskAsync(It.IsAny<DomainTask>()))
                      .ReturnsAsync((DomainTask t) => t);
 
@@ -40,7 +40,7 @@ namespace TaskFlow.Tests.Services
         [Fact]
         public async SysTask UpdateTaskAsync_NoObservers_DoesNotThrow()
         {
-            var task = new DomainTask { Id = 1, ActivityId = 1 };
+            var task = new DomainTask { Id = 1, ActivityId = 1, Title = "Tarea" };
             _repoMock.Setup(r => r.UpdateTaskAsync(It.IsAny<DomainTask>()))
                      .ReturnsAsync((DomainTask t) => t);
 
@@ -53,7 +53,7 @@ namespace TaskFlow.Tests.Services
         [Fact]
         public async SysTask RemoveObserver_StopsReceivingNotifications()
         {
-            var task = new DomainTask { Id = 1, ActivityId = 1 };
+            var task = new DomainTask { Id = 1, ActivityId = 1, Title = "Tarea" };
             _repoMock.Setup(r => r.UpdateTaskAsync(It.IsAny<DomainTask>()))
                      .ReturnsAsync((DomainTask t) => t);
 
@@ -83,12 +83,51 @@ namespace TaskFlow.Tests.Services
         [Fact]
         public async SysTask DeleteTaskAsync_ReturnsFalse_WhenNotFound()
         {
-            _repoMock.Setup(r => r.DeleteTaskAsync(99)).ReturnsAsync(false);
+            _repoMock.Setup(r => r.DeleteTaskAsync(99, "user-a")).ReturnsAsync(false);
 
             var service = new TaskService(_repoMock.Object);
-            var result = await service.DeleteTaskAsync(99);
+            var result = await service.DeleteTaskAsync(99, "user-a");
 
             Assert.False(result);
+        }
+
+        [Fact]
+        public async SysTask CreateTaskAsync_RejectsWhitespaceTitle()
+        {
+            var service = new TaskService(_repoMock.Object);
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
+                () => service.CreateTaskAsync(new DomainTask { Title = "   " }));
+
+            Assert.Equal("El título es obligatorio.", exception.Message);
+            _repoMock.Verify(r => r.CreateTaskAsync(It.IsAny<DomainTask>()), Times.Never);
+        }
+
+        [Fact]
+        public async SysTask GetTaskByIdAsync_UsesAuthenticatedUserId()
+        {
+            _repoMock.Setup(r => r.GetTaskByIdAsync(7, "user-a"))
+                .ReturnsAsync(new DomainTask { Id = 7, UserId = "user-a", Title = "Propia" });
+            var service = new TaskService(_repoMock.Object);
+
+            var result = await service.GetTaskByIdAsync(7, "user-a");
+
+            Assert.NotNull(result);
+            _repoMock.Verify(r => r.GetTaskByIdAsync(7, "user-a"), Times.Once);
+            _repoMock.Verify(r => r.GetTaskByIdAsync(7, "user-b"), Times.Never);
+        }
+
+        [Fact]
+        public async SysTask CreateSubTaskAsync_ReturnsNull_WhenParentDoesNotBelongToUser()
+        {
+            _repoMock.Setup(r => r.GetTaskByIdAsync(9, "user-b"))
+                .ReturnsAsync((DomainTask?)null);
+            var service = new TaskService(_repoMock.Object);
+
+            var result = await service.CreateSubTaskAsync(9, "Intento ajeno", "user-b");
+
+            Assert.Null(result);
+            _repoMock.Verify(r => r.CreateSubTaskAsync(It.IsAny<TaskFlow.Domain.Models.SubTask>()), Times.Never);
         }
     }
 }

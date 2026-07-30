@@ -27,6 +27,12 @@ namespace TaskFlow.Domain.Builders
             return this;
         }
 
+        public TaskBuilder WithPriority(string priority)
+        {
+            _task.Priority = priority;
+            return this;
+        }
+
         public TaskBuilder WithDueTime(DateTime? dueTime)
         {
             _task.DueTime = dueTime;

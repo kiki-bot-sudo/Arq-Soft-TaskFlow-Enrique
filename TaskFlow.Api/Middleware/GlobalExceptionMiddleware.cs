@@ -47,9 +47,9 @@ namespace TaskFlow.Api.Middleware
                     response.Message = "El recurso solicitado no fue encontrado.";
                     break;
 
-                case ArgumentNullException:
+                case ArgumentException:
                     response.StatusCode = HttpStatusCode.BadRequest;
-                    response.Message = "Los parámetros proporcionados son inválidos.";
+                    response.Message = exception.Message;
                     break;
 
                 case InvalidOperationException:

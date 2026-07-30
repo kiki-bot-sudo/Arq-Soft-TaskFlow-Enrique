@@ -1,22 +1,29 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using TaskFlow.Domain.Models;
+using TaskFlow.Infrastructure.Identity;
 using Task = TaskFlow.Domain.Models.Task;
 
 namespace TaskFlow.Infrastructure.Data
 {
-    public class TaskFlowDbContext : DbContext
+    public class TaskFlowDbContext : IdentityDbContext<ApplicationUser>
     {
         public TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options)
             : base(options) { }
 
         public DbSet<Activity> Activities { get; set; }
         public DbSet<Task> Tasks { get; set; }
+        public DbSet<SubTask> SubTasks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Activity>().HasKey(a => a.Id);
+            modelBuilder.Entity<Activity>().Property(a => a.Title).HasMaxLength(100).IsRequired();
+            modelBuilder.Entity<Activity>().Property(a => a.Description).HasMaxLength(500);
+            modelBuilder.Entity<Activity>().Property(a => a.Category).HasMaxLength(50).IsRequired();
+            modelBuilder.Entity<Activity>().Property(a => a.Priority).HasMaxLength(10).HasDefaultValue("Normal");
             modelBuilder.Entity<Activity>()
                 .HasMany(a => a.Tasks)
                 .WithOne(t => t.Activity)
@@ -24,6 +31,26 @@ namespace TaskFlow.Infrastructure.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Task>().HasKey(t => t.Id);
+            modelBuilder.Entity<Task>().Property(t => t.Title).HasMaxLength(100).IsRequired();
+            modelBuilder.Entity<Task>().Property(t => t.Description).HasMaxLength(500);
+            modelBuilder.Entity<Task>().Property(t => t.Priority).HasMaxLength(10).HasDefaultValue("Medium");
+            modelBuilder.Entity<Task>().HasIndex(t => t.DueTime);
+            modelBuilder.Entity<Task>().HasIndex(t => new { t.IsCompleted, t.Priority });
+            modelBuilder.Entity<Task>().Property(t => t.UserId).HasMaxLength(450);
+            modelBuilder.Entity<Task>().HasIndex(t => t.UserId);
+            modelBuilder.Entity<Task>()
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SubTask>().HasKey(s => s.Id);
+            modelBuilder.Entity<SubTask>().Property(s => s.Title).HasMaxLength(100).IsRequired();
+            modelBuilder.Entity<SubTask>()
+                .HasOne(s => s.Task)
+                .WithMany(t => t.SubTasks)
+                .HasForeignKey(s => s.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Seed data
             var seedDate = new DateTime(2026, 6, 24, 0, 0, 0, DateTimeKind.Utc);

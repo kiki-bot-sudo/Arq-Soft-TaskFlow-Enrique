@@ -25,9 +25,9 @@ namespace TaskFlow.Tests.Observers
         [Fact]
         public async SysTask OnTaskUpdated_AllTasksComplete_MarksActivityAsCompleted()
         {
-            var task = new DomainTask { Id = 1, ActivityId = 10, IsCompleted = true };
+            var task = new DomainTask { Id = 1, ActivityId = 10, UserId = "user-a", IsCompleted = true };
 
-            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(10))
+            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(10, "user-a"))
                 .ReturnsAsync(new List<DomainTask>
                 {
                     new() { Id = 1, IsCompleted = true },
@@ -49,9 +49,9 @@ namespace TaskFlow.Tests.Observers
         [Fact]
         public async SysTask OnTaskUpdated_NotAllComplete_DoesNotMarkActivity()
         {
-            var task = new DomainTask { Id = 1, ActivityId = 10, IsCompleted = true };
+            var task = new DomainTask { Id = 1, ActivityId = 10, UserId = "user-a", IsCompleted = true };
 
-            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(10))
+            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(10, "user-a"))
                 .ReturnsAsync(new List<DomainTask>
                 {
                     new() { Id = 1, IsCompleted = true },
@@ -70,9 +70,9 @@ namespace TaskFlow.Tests.Observers
         [Fact]
         public async SysTask OnTaskUpdated_TaskUncompleted_ReopensActivity()
         {
-            var task = new DomainTask { Id = 1, ActivityId = 10, IsCompleted = false };
+            var task = new DomainTask { Id = 1, ActivityId = 10, UserId = "user-a", IsCompleted = false };
 
-            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(10))
+            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(10, "user-a"))
                 .ReturnsAsync(new List<DomainTask>
                 {
                     new() { Id = 1, IsCompleted = false },
@@ -96,9 +96,9 @@ namespace TaskFlow.Tests.Observers
         [Fact]
         public async SysTask OnTaskUpdated_NoTasks_DoesNothing()
         {
-            var task = new DomainTask { Id = 1, ActivityId = 10 };
+            var task = new DomainTask { Id = 1, ActivityId = 10, UserId = "user-a" };
 
-            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(10))
+            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(10, "user-a"))
                 .ReturnsAsync(new List<DomainTask>());
 
             var observer = CreateObserver();
@@ -110,9 +110,9 @@ namespace TaskFlow.Tests.Observers
         [Fact]
         public async SysTask OnTaskUpdated_ActivityNotFound_DoesNotThrow()
         {
-            var task = new DomainTask { Id = 1, ActivityId = 99 };
+            var task = new DomainTask { Id = 1, ActivityId = 99, UserId = "user-a" };
 
-            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(99))
+            _taskRepoMock.Setup(r => r.GetTasksByActivityAsync(99, "user-a"))
                 .ReturnsAsync(new List<DomainTask> { new() { IsCompleted = true } });
 
             _activityRepoMock.Setup(r => r.GetActivityByIdAsync(99))

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using TaskFlow.Api.DTOs;
 using TaskFlow.Application.Interfaces;
 using TaskFlow.Domain.Builders;
@@ -11,6 +13,7 @@ namespace TaskFlow.Api.Controllers
     /// Usa el patrón Builder para construir instancias de Task desde los DTOs.
     /// </summary>
     [ApiController]
+    [Authorize]
     [Route("api/activity/{activityId}/[controller]")]
     public class TaskController : ControllerBase
     {
@@ -26,7 +29,7 @@ namespace TaskFlow.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTasksByActivity(int activityId)
         {
-            var tasks = await _taskService.GetTasksByActivityAsync(activityId);
+            var tasks = await _taskService.GetTasksByActivityAsync(activityId, UserId);
             return Ok(tasks);
         }
 
@@ -34,10 +37,10 @@ namespace TaskFlow.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetTaskById(int id)
+        public async Task<IActionResult> GetTaskById(int activityId, int id)
         {
-            var task = await _taskService.GetTaskByIdAsync(id);
-            if (task == null) return NotFound();
+            var task = await _taskService.GetTaskByIdAsync(id, UserId);
+            if (task == null || task.ActivityId != activityId) return NotFound();
             return Ok(task);
         }
 
@@ -54,8 +57,10 @@ namespace TaskFlow.Api.Controllers
                 .WithActivityId(activityId)
                 .WithTitle(dto.Title)
                 .WithDescription(dto.Description)
+                .WithPriority(dto.Priority)
                 .WithDueTime(dto.DueTime)
                 .Build();
+            task.UserId = UserId;
 
             var created = await _taskService.CreateTaskAsync(task);
             return CreatedAtAction(nameof(GetTaskById), new { activityId, id = created.Id }, created);
@@ -65,13 +70,14 @@ namespace TaskFlow.Api.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateTask(int id, [FromBody] UpdateTaskDto dto)
+        public async Task<IActionResult> UpdateTask(int activityId, int id, [FromBody] UpdateTaskDto dto)
         {
-            var task = await _taskService.GetTaskByIdAsync(id);
-            if (task == null) return NotFound();
+            var task = await _taskService.GetTaskByIdAsync(id, UserId);
+            if (task == null || task.ActivityId != activityId) return NotFound();
 
             task.Title = dto.Title;
             task.Description = dto.Description;
+            task.Priority = dto.Priority;
             task.IsCompleted = dto.IsCompleted;
             task.DueTime = dto.DueTime;
 
@@ -83,11 +89,16 @@ namespace TaskFlow.Api.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteTask(int id)
+        public async Task<IActionResult> DeleteTask(int activityId, int id)
         {
-            var result = await _taskService.DeleteTaskAsync(id);
+            var task = await _taskService.GetTaskByIdAsync(id, UserId);
+            if (task == null || task.ActivityId != activityId) return NotFound();
+            var result = await _taskService.DeleteTaskAsync(id, UserId);
             if (!result) return NotFound();
             return NoContent();
         }
+
+        private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? throw new InvalidOperationException("No se encontró el usuario autenticado.");
     }
 }

@@ -28,7 +28,8 @@ namespace TaskFlow.Application.Observers
 
         public async Task OnTaskUpdatedAsync(TaskFlow.Domain.Models.Task task)
         {
-            var allTasks = await _taskRepository.GetTasksByActivityAsync(task.ActivityId);
+            if (string.IsNullOrEmpty(task.UserId)) return;
+            var allTasks = await _taskRepository.GetTasksByActivityAsync(task.ActivityId, task.UserId);
             var taskList = allTasks.ToList();
 
             if (taskList.Count == 0) return;
