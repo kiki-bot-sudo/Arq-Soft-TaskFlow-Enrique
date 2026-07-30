@@ -41,9 +41,9 @@ builder.Services.AddCors(options =>
     {
         var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
         if (builder.Environment.IsDevelopment() && origins.Length == 0)
-            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            policy.WithOrigins("http://localhost:5173").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
         else if (origins.Length > 0)
-            policy.WithOrigins(origins).AllowAnyMethod().AllowAnyHeader();
+            policy.WithOrigins(origins).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     });
 });
 
@@ -69,8 +69,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "TaskFlow.Auth";
     options.Cookie.HttpOnly = true;
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = builder.Environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
     options.Events.OnRedirectToLogin = context =>
     {
         if (context.Request.Path.StartsWithSegments("/api"))
