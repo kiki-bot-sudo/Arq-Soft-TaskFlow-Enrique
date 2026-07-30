@@ -13,6 +13,14 @@ obj/
 ## Environment
 .env
 appsettings.Development.json
+appsettings.Local.json
+*.PublishSettings
+*.pubxml
+*.pubxml.user
+*.publish.xml
+secrets.json
+publish/
+docs/taskflow-azure-qr.png
 
 ## OS
 .DS_Store
