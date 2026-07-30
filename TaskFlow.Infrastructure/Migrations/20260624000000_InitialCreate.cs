@@ -1,10 +1,14 @@
 using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using TaskFlow.Infrastructure.Data;
 
 #nullable disable
 
 namespace TaskFlow.Infrastructure.Migrations
 {
+    [DbContext(typeof(TaskFlowDbContext))]
+    [Migration("20260624000000_InitialCreate")]
     /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
