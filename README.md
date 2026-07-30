@@ -1,115 +1,127 @@
-# TaskFlow API
+# TaskFlow — Agenda personal
 
-API RESTful para gestión de actividades y tareas personales. Desarrollada con ASP.NET Core 8 + arquitectura en capas + patrones GoF.
+TaskFlow es una agenda web escolar para organizar tareas personales. Incluye cuentas seguras, tareas privadas por usuario y subtareas.
 
----
+## Objetivo
+
+Aplicar .NET, ASP.NET Core, Entity Framework Core, arquitectura por capas y despliegue en Azure en una solución pequeña, entendible y presentable.
+
+## Tecnologías
+
+- .NET 8 y ASP.NET Core Web API.
+- Entity Framework Core 8.
+- SQL Server / Azure SQL Database.
+- HTML5, CSS3 y JavaScript nativo.
+- xUnit y Moq.
+- Swagger/OpenAPI.
 
 ## Requisitos
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- SQL Server o SQL Server Express
+- .NET 8 SDK.
+- SQL Server Express, LocalDB o SQL Server.
+- Opcional: Visual Studio 2022.
 
----
+## Instalación y base de datos
 
-## Configuración y arranque
-
-### 1. Clonar y posicionarse en la rama
-
-```bash
+```powershell
 git clone https://github.com/kiki-bot-sudo/Arq-Soft-TaskFlow-Enrique.git
 cd Arq-Soft-TaskFlow-Enrique
-git checkout api
+dotnet restore
+dotnet ef database update --project TaskFlow.Infrastructure --startup-project TaskFlow.Api
 ```
 
-### 2. Configurar la base de datos
+La conexión de desarrollo está en `TaskFlow.Api/appsettings.json`. Se recomienda sobrescribirla con Secret Manager:
 
-Edita `TaskFlow.Api/appsettings.json` con tu cadena de conexión:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=TaskFlowDb;Trusted_Connection=True;TrustServerCertificate=True;"
-  }
-}
+```powershell
+dotnet user-secrets init --project TaskFlow.Api
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost\SQLEXPRESS;Database=TaskFlowDb;Trusted_Connection=True;TrustServerCertificate=True" --project TaskFlow.Api
 ```
 
-### 3. Crear la base de datos y aplicar migraciones
+## Ejecución
 
-```bash
-cd TaskFlow.Api
-dotnet ef database update --project ../TaskFlow.Infrastructure
-```
-
-Esto crea la base de datos `TaskFlowDb` y carga el seed data (3 actividades y 3 tareas de ejemplo).
-
-### 4. Correr la API
-
-```bash
+```powershell
 dotnet run --project TaskFlow.Api
 ```
 
-La API estará disponible en `https://localhost:5001` (o el puerto que muestre la consola).  
-Swagger UI en: `https://localhost:5001/` (raíz)
+- Agenda: `https://localhost:57306`
+- Swagger: `https://localhost:57306/swagger`
+- Salud: `https://localhost:57306/health`
 
----
+## Funcionalidades
 
-## Endpoints principales
+- CRUD completo de tareas.
+- Registro, inicio y cierre de sesión con ASP.NET Core Identity.
+- Tareas, estadísticas y filtros aislados por usuario.
+- Subtareas que pueden agregarse, completarse y eliminarse.
+- Título obligatorio, descripción, fecha de creación y fecha límite.
+- Prioridad baja, media y alta.
+- Estado pendiente, completado y vencido.
+- Búsqueda por título, filtros y ordenamiento.
+- Estadísticas de total, pendientes, completadas y vencidas.
+- Interfaz responsive, confirmación al eliminar y mensajes de resultado.
+- Rutas antiguas de actividades conservadas por compatibilidad.
 
-### Actividades
+Identity almacena hashes seguros, nunca contraseñas en texto. Las tareas anteriores a la migración conservan `UserId = null` y no se asignan automáticamente a una cuenta.
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/activity/today` | Actividades de hoy |
-| GET | `/api/activity/date/{date}` | Actividades por fecha |
-| GET | `/api/activity/{id}` | Actividad por ID |
-| POST | `/api/activity` | Crear actividad |
-| PUT | `/api/activity/{id}` | Actualizar actividad |
-| DELETE | `/api/activity/{id}` | Eliminar actividad |
+## Estructura
 
-### Tareas
-
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/activity/{activityId}/task` | Tareas de una actividad |
-| GET | `/api/activity/{activityId}/task/{id}` | Tarea por ID |
-| POST | `/api/activity/{activityId}/task` | Crear tarea |
-| PUT | `/api/activity/{activityId}/task/{id}` | Actualizar tarea |
-| DELETE | `/api/activity/{activityId}/task/{id}` | Eliminar tarea |
-
-> **Nota:** Al marcar todas las tareas de una actividad como completadas, la actividad se marca automáticamente como completada (patrón Observer).
-
----
-
-## Correr los tests
-
-```bash
-dotnet test TaskFlow.Tests
+```text
+TaskFlow.Domain/          Entidades y builders
+TaskFlow.Application/     Servicios y reglas de aplicación
+TaskFlow.Infrastructure/  DbContext, repositorios y migraciones
+TaskFlow.Api/             API, DTO, middleware y frontend en wwwroot
+TaskFlow.Tests/           Pruebas con xUnit y Moq
+docs/                     ADR, ATAM, línea de productos y diagramas
 ```
 
-20 pruebas unitarias cubriendo todos los patrones GoF implementados.
+## Pruebas
 
----
-
-## Patrones de diseño aplicados
-
-Ver [`PATRONES-GOF.md`](./PATRONES-GOF.md) para documentación completa.
-
-| Patrón | Dónde |
-|--------|-------|
-| Strategy | Ordenamiento de actividades (`Application/Strategies/`) |
-| Builder | Construcción de entidades (`Domain/Builders/`) |
-| Decorator | Logging de operaciones (`Application/Decorators/`) |
-| Observer | Auto-completado de actividades (`Application/Observers/`) |
-
----
-
-## Estructura del proyecto
-
+```powershell
+dotnet build TaskFlow.sln --configuration Release
+dotnet test TaskFlow.Tests --configuration Release
 ```
-TaskFlow.sln
-├── TaskFlow.Domain/          # Modelos de entidad
-├── TaskFlow.Infrastructure/  # Repositorios, DbContext, Migraciones
-├── TaskFlow.Application/     # Servicios, Interfaces, Patrones GoF
-├── TaskFlow.Api/             # Controllers, DTOs, Middleware
-└── TaskFlow.Tests/           # Tests unitarios (xUnit + Moq)
+
+## Despliegue básico en Azure
+
+1. Crear una Azure SQL Database y permitir la conexión desde Azure App Service.
+2. Crear un App Service para .NET 8.
+3. En **Configuration**, agregar `ConnectionStrings__DefaultConnection` con la conexión de Azure SQL.
+4. Aplicar migraciones antes del primer arranque:
+
+   ```powershell
+   dotnet ef database update --project TaskFlow.Infrastructure --startup-project TaskFlow.Api --connection "<cadena-azure-sql>"
+   ```
+
+5. Publicar:
+
+   ```powershell
+   dotnet publish TaskFlow.Api -c Release -o ./publish
+   az webapp deploy --resource-group <grupo> --name <app> --src-path ./publish.zip --type zip
+   ```
+
+6. Comprobar `/health`, la página principal y el CRUD.
+
+Para producción, la cadena de conexión debe guardarse en App Service o Key Vault, nunca en Git.
+
+## Documentación
+
+- [Decisiones arquitectónicas](docs/adr/)
+- [Evaluación ATAM simplificada](docs/ATAM.md)
+- [Línea de productos](docs/LineaDeProductos.md)
+- [Diagramas](docs/Diagramas.md)
+- [Guía detallada de Azure](docs/AZURE_DEPLOYMENT.md)
+
+## URL pública y QR
+
+Todavía no existe una URL real de Azure, por lo que no se incluye un QR ficticio. Después del despliegue:
+
+```powershell
+python -m pip install "qrcode[pil]"
+.\scripts\generate-qr.ps1 -Url "https://<nombre-real>.azurewebsites.net"
 ```
+
+El resultado se guarda en `docs/taskflow-azure-qr.png`. Añade al README la imagen y la URL escrita una vez verificadas.
+
+## Capturas
+
+Agrega aquí capturas del login, dashboard y subtareas después de la exposición final.
