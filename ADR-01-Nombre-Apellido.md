@@ -1,55 +1,25 @@
-# ADR-01: [Título corto de la decisión]
+# ADR-01: API REST para la gestión de TaskFlow
 
-| Campo  | Valor |
-|--------|-------|
-| Autor  | [Nombre Apellido] |
-| Fecha  | DD/MM/AAAA |
-| Estado | `Propuesto` · `Aceptado` · `Rechazado` · `Reemplazado por ADR-NN` |
-
----
+**Estado:** Aceptado
+**Fecha:** 2026-06-05
 
 ## Contexto
 
-¿Qué estás construyendo, qué problema resuelve y para quién es? Describe también las condiciones o restricciones que influyeron en esta decisión — por ejemplo, el tiempo disponible, el equipo, las tecnologías que ya conoces o las que viste en clase.
-
----
+TaskFlow necesita exponer la gestión de actividades y tareas a una interfaz web. El proyecto académico debe mantener separadas la presentación, las reglas de aplicación y el acceso a datos, y utilizar mecanismos HTTP conocidos y fáciles de comprobar.
 
 ## Decisión
 
-¿Qué decidiste? Sé específico: nombra la tecnología, el patrón o el estilo arquitectónico que elegiste.
+Implementar una API REST con controladores de ASP.NET Core. Los controladores reciben solicitudes HTTP, validan los DTO y delegan las operaciones en los servicios de la capa de aplicación.
 
-### ¿Por qué?
+## Alternativas consideradas
 
-Argumenta tu decisión. No basta con decir "es lo que vimos en clase" — explica qué característica concreta de lo que elegiste resuelve tu problema.
-
-### Alternativas consideradas
-
-*(Mínimo 3 filas)*
-
-| Alternativa | Por qué la descarté |
-|-------------|---------------------|
-| ...         | ...                 |
-| ...         | ...                 |
-| ...         | ...                 |
-
----
+- Razor Pages con acceso directo desde páginas: reduce archivos inicialmente, pero acopla más la presentación con el servidor.
+- GraphQL: permite consultas flexibles, aunque agrega complejidad innecesaria para el CRUD del proyecto.
+- Servicios SOAP: ofrecen contratos formales, pero requieren más configuración y no corresponden al estilo del frontend existente.
 
 ## Consecuencias
 
-**✅ Lo que gano:**
-
-Menciona al menos:
-- Una consecuencia **técnica** — qué se vuelve más fácil de construir, mantener o escalar en tu sistema
-- Una consecuencia sobre el **proceso o el equipo** — cómo afecta la forma en que vas a trabajar
-
-**⚠️ Lo que sacrifico o asumo:**
-
-Menciona al menos:
-- Una **limitación técnica** — qué no podrás hacer fácilmente con esta decisión
-- Una **deuda o riesgo** — qué podrías tener que resolver más adelante si el proyecto crece
-
-## Diagrama
-
-Un boceto de cómo se estructura tu sistema (draw.io, Mermaid o a mano escaneado)
-
-![Diagrama del sistema]( ./ruta/diagrama-nivel-1.png )
+- La interfaz web puede consumir operaciones mediante HTTP y JSON.
+- Los controladores se mantienen separados de la persistencia y las reglas de aplicación.
+- Es posible documentar y probar la API con Swagger.
+- Deben mantenerse contratos, códigos HTTP y validaciones coherentes entre el frontend y el backend.

@@ -1,6 +1,7 @@
 # ADR 007: Autenticación con ASP.NET Core Identity
 
 **Estado:** Aceptado
+**Fecha:** 2026-07-29
 
 ## Contexto
 
@@ -16,14 +17,16 @@ Usar ASP.NET Core Identity con cookies HTTP y las tablas Identity almacenadas en
 - Sesiones y contraseñas propias: más simples en apariencia, pero menos seguras.
 - Microsoft Entra ID: adecuado para organizaciones, pero excesivo para el alcance escolar.
 
-## Consecuencias positivas
+## Consecuencias
+
+### Positivas
 
 - Contraseñas cifradas mediante hashing seguro de Identity.
 - Cookies `HttpOnly`.
 - Validación de correo único y políticas de contraseña.
 - Herramientas integradas con EF Core.
 
-## Consecuencias negativas
+### Negativas
 
 - Se agregan varias tablas Identity.
 - La aplicación depende de cookies y del mismo dominio para frontend y API.

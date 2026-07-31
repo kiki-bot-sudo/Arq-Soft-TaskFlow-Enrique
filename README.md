@@ -11,7 +11,7 @@ Aplicar .NET, ASP.NET Core, Entity Framework Core, arquitectura por capas y desp
 - .NET 8 y ASP.NET Core Web API.
 - Entity Framework Core 8.
 - SQL Server / Azure SQL Database.
-- React 19, Vite y Tailwind CSS en el repositorio `taskflow-frontend`.
+- HTML, CSS y JavaScript nativo servido desde `TaskFlow.Api/wwwroot`.
 - xUnit y Moq.
 - Swagger/OpenAPI.
 
@@ -113,15 +113,14 @@ Para producción, la cadena de conexión debe guardarse en App Service o Key Vau
 
 ## URL pública y QR
 
-- Aplicación: <https://proud-field-0f9b89c10.7.azurestaticapps.net>
-- API: <https://taskflow-api-enriq73026.azurewebsites.net>
+- Aplicación y API: <https://taskflow-api-enriq73026.azurewebsites.net>
 - Salud: <https://taskflow-api-enriq73026.azurewebsites.net/health>
 
 Para regenerar el QR:
 
 ```powershell
 python -m pip install "qrcode[pil]"
-.\scripts\generate-qr.ps1 -Url "https://proud-field-0f9b89c10.7.azurestaticapps.net"
+.\scripts\generate-qr.ps1 -Url "https://taskflow-api-enriq73026.azurewebsites.net"
 ```
 
 El resultado se guarda localmente en `docs/taskflow-azure-qr.png`.

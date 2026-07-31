@@ -1,5 +1,8 @@
 # ADR-03: Suite de Pruebas Automatizadas y Pipeline CI/CD
 
+**Estado:** Aceptado
+**Fecha:** 2026-07-22
+
 | Campo   | Valor              |
 |---------|--------------------| 
 | Autor   | Enrique Zavala     |
@@ -157,6 +160,16 @@ TaskFlow.Tests/
 - [ ] Performance benchmarks
 
 ---
+
+## Alternativas consideradas
+
+- Ejecutar pruebas únicamente de forma manual: requiere menos configuración, pero facilita que los errores lleguen al repositorio.
+- Usar otro proveedor de CI: es viable, aunque GitHub Actions se integra directamente con el repositorio existente.
+
+## Consecuencias
+
+- Cada actualización puede validar compilación y pruebas de manera repetible.
+- El workflow y las pruebas requieren mantenimiento cuando cambian dependencias o contratos.
 
 ## Conclusión
 

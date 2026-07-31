@@ -1,5 +1,8 @@
 # ADR-02: Vistas Arquitectónicas del Sistema TaskFlow
 
+**Estado:** Aceptado
+**Fecha:** 2026-06-05
+
 | Campo   | Valor              |
 |---------|--------------------| 
 | Autor   | Enrique Zavala     |
@@ -312,6 +315,16 @@ public class TaskDto
 5. **Documentación automática:** Swagger genera documentación de la API automáticamente.
 
 ---
+
+## Alternativas consideradas
+
+- Documentar únicamente un diagrama general: más breve, pero insuficiente para explicar responsabilidades y despliegue.
+- Usar UML completo: ofrece mayor formalidad, aunque resulta excesivo para el alcance académico del proyecto.
+
+## Consecuencias
+
+- Las vistas facilitan explicar la solución desde distintas perspectivas.
+- La documentación requiere actualizarse cuando cambian componentes, dependencias o despliegue.
 
 ## Conclusión
 

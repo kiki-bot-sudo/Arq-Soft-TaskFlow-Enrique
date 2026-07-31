@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function authenticate() {
   const response = await fetch("/api/auth/me");
-  if (response.status === 401) { location.replace("/login.html"); return false; }
+  if (response.status === 401) { location.replace("/welcome.html"); return false; }
   if (!response.ok) { showToast("No fue posible comprobar la sesión.", true); return false; }
   const user = await response.json(); $("current-user").textContent = user.displayName;
   return true;
