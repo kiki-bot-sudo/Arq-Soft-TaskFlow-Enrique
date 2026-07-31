@@ -78,7 +78,7 @@ window.openEdit = id => {
 async function saveTask(event) {
   event.preventDefault();
   const id=$("task-id").value, current=state.tasks.find(x=>x.id===Number(id));
-  const payload={title:$("title").value.trim(),description:$("description").value.trim(),priority:$("priority").value,dueTime:$("due-time").value?new Date($("due-time").value).toISOString():null};
+  const payload={title:$("title").value.trim(),description:$("description").value.trim(),priority:$("priority").value,dueTime:$("due-time").value||null};
   if(id) payload.isCompleted=current?.isCompleted??false;
   try {
     const response=await fetch(id?`${api}/${id}`:api,{method:id?"PUT":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
