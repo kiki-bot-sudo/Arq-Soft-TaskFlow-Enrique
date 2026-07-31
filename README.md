@@ -126,6 +126,3 @@ python -m pip install "qrcode[pil]"
 
 El resultado se guarda localmente en `docs/taskflow-azure-qr.png`.
 
-## Capturas
-
-Agrega aquí capturas del login, dashboard y subtareas después de la exposición final.
